@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "deasync": "^0.1.24",
+    "pg": "^8.7.1"
+  },
+  "name": "tw",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
