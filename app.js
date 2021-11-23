@@ -15,7 +15,8 @@ const server = http.createServer(async function(req, res) {
     }
 
     const queryObject = url.parse(req.url,true).query;   // url query
-    var jsonResponse = null; 
+
+    var jsonResponse = null;
     switch(queryObject.type){
       case 'signup':
         console.log("Case de signup")
