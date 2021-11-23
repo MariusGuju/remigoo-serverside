@@ -45,7 +45,7 @@ function createAccount(name, password, email_address, date_of_birth){
 
 function loginAccount(email_address, password){
   return (async () => {
-      const client = await pool.connect()
+      const client = await pool.connect() 
       console.log("A intrat in loginAccount()")
       var jsonResponse;
       try {
@@ -206,22 +206,28 @@ function changePassword(id, pass_nou){
 
 function changeName(id, nume_nou){
   return (async () => {
-      const client = await pool.connect()
-      console.log("A intrat in changeName()")
-      var jsonResponse;
+
+      const client = await pool.connect() // o sa ne folosim de client pentru a ne conecta la baza de date (pool este definit in databasepg.js)
+      console.log("A intrat in changeName()")  // doar verific sa stiu daca a intrat in functia corecta, am avut niste probleme la export si am lasat console.log asta sa fiu sigur
+      var jsonResponse; // jsonResponse va fii dat la sfarsitul functiei ca si return
+
       try {
+          // fullResponse este template pt response, asta o sa ii dam ca si response lui mihai, doar ca in forma de json
           let fullResponse = {
               error:false,
               code: 0,
               content: "Nume schimbat cu succes"
               }
         
-        const data = await client.query(`UPDATE public.users SET name='${nume_nou}' WHERE id='${id}'`);  
+        const data = await client.query(`UPDATE public.users SET name='${nume_nou}' WHERE id='${id}'`);  // facem query spre baza de date, si raspunsul bazei de date il stocam in data
 
           // verificam daca am primit raspuns de la baza de date, si daca a fost vreun row afecatat de schimbare
         if(data != undefined && data.rowCount != 0){
-          jsonResponse = JSON.stringify(fullResponse);
+          jsonResponse = JSON.stringify(fullResponse); // daca am primit raspuns de la baza de date si macar un row din baza de date a fost afectat, ii atribuim lui jsonResponse
+                                                       // fullResponse de mai sus (in forma json), nemodificat ( presupunem ca numele a fost schimbat cu succes )
 
+          // daca nu am primit raspuns de la baza de date (data == undefined), sau daca nu a fost nici un row din baza de date afectat ( data.rowCount == 0 ), inseamna ca query-ul n-a funtionat
+          // si modificat template-ul ca sa ii spunem lui mihai ca a fost o eroare la baza de date, si dupa punem in jsonResponse fullResponse-ul modificat (in forma json)                                             
         } else {
           fullResponse.error = true;
           fullResponse.content = 'database error';
@@ -231,6 +237,9 @@ function changeName(id, nume_nou){
         
       } finally {
 
+        // finally asta e aici, ca in cazul in care query de mai sus pusca, fiind in try, o sa se opreasca tot try si o sa se ruleze direct acest finally, in care modificam doar template
+        // sa-i spunem lui mihaitza ca a fost o eroare
+
         if(jsonResponse == undefined)
           jsonResponse = JSON.stringify({
             error:true,
@@ -238,8 +247,9 @@ function changeName(id, nume_nou){
             content: "database error"
             });
 
-        return jsonResponse;
-        client.release()
+        
+        return jsonResponse; // returnam la final jsonResponse care trb sa contina un JSON.stringify(fullResponse)
+        client.release() // si important sa avem client.release() la final, nu stiu de ce dar asa zice google
       }
     })().catch(err => console.log(err.stack))
 }
