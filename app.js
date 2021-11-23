@@ -16,6 +16,10 @@ const server = http.createServer(async function(req, res) {
 
     const queryObject = url.parse(req.url,true).query;   // url query
 
+    // exemplu de query http://localhost:3000/page?type=getuser&email_address=flo29@yahoo.com
+    // un queryObject.type va returna getuser, queryObject.email_address va returna flo29@yahoo.com s.a.m.d.
+
+
     var jsonResponse = null;
     switch(queryObject.type){
       case 'signup':
