@@ -21,34 +21,38 @@ const server = http.createServer(async function(req, res) {
 
 
     var jsonResponse = null;
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+
     switch(queryObject.type){
       case 'signup':
-        console.log("Case de signup")
+        console.log(timestamp,"Case de signup")
         jsonResponse = await accountFunctions.createAccount(queryObject.name, queryObject.password, queryObject.email_address, queryObject.date_of_birth);
         break;
 
       case 'login':
-        console.log("Case de login")
+        console.log(timestamp,"Case de login")
         jsonResponse = await accountFunctions.loginAccount(queryObject.email_address, queryObject.password);
         break;
 
       case 'getuser':
-        console.log("Case de getuser")
+        console.log(timestamp,"Case de getuser")
         jsonResponse = await accountFunctions.retrieveUser(queryObject.email_address);
+        console.log("\t----Response:",jsonResponse)
         break;
 
       case 'change-email':
-        console.log("Case de change-email")
+        console.log(timestamp,"Case de change-email")
         jsonResponse = await accountFunctions.changeEmail(queryObject.id, queryObject.email_address);
         break;
 
       case 'change-password':
-        console.log("Case de change-password")
+        console.log(timestamp,"Case de change-password")
         jsonResponse = await accountFunctions.changePassword(queryObject.id, queryObject.password);
         break;
 
       case 'change-name':
-        console.log("Case de change-name")
+        console.log(timestamp,"Case de change-name")
         jsonResponse = await accountFunctions.changeName(queryObject.id, queryObject.name);
         break;
     }
