@@ -42,14 +42,26 @@ function loginAccount(email_address, password){
             const data = await client.query(`SELECT * FROM users WHERE email_address='${email_address}'`);
             const arr = data.rows[0];
 
+
             if(arr != undefined && password != arr.password){
                 Response.code=5;
                 Response.content='Wrong email or password ';
             }
             else {
+                var date = new Date().getTime();
+                let token = date + arr.email_address + "-AT"
+
+
                 Response.error=false;
-                Response.content='success';
+                Response.content={
+                    token: token,
+                    userEmail: arr.email_address,
+                    userId: arr.id,
+                    userName: arr.name
+                };
                 Response.code=0;
+
+                client.query(`UPDATE public.users SET auth_token='${token}' WHERE id='${arr.id}'`);
             }
 
         } finally {
@@ -88,7 +100,7 @@ function retrieveUser(email_address){
     })().catch(err => console.log(err.stack))
 }
 
-function changeEmail(id, email_nou){
+function changeEmail(id, new_email){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -97,7 +109,7 @@ function changeEmail(id, email_nou){
             content: "database error"
         }
         try {
-            const data = await client.query(`UPDATE public.users SET email_address='${email_nou}' WHERE id='${id}'`);
+            const data = await client.query(`UPDATE public.users SET email_address='${new_email}' WHERE id='${id}'`);
 
             if(data === undefined || data.rowCount === 0){
                 Response.code = 10;
@@ -117,7 +129,7 @@ function changeEmail(id, email_nou){
     })().catch(err => console.log(err.stack))
 }
 
-function changePassword(id, pass_nou){
+function changePassword(id, new_pass){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -126,7 +138,7 @@ function changePassword(id, pass_nou){
             content: "database error"
         }
         try {
-            const data = await client.query(`UPDATE public.users SET password='${pass_nou}' WHERE id='${id}'`);
+            const data = await client.query(`UPDATE public.users SET password='${new_pass}' WHERE id='${id}'`);
 
             // verificam daca am primit raspuns de la baza de date, si daca a fost vreun row afecatat de schimbare
             if(data != undefined && data.rowCount != 0){
@@ -142,7 +154,7 @@ function changePassword(id, pass_nou){
     })().catch(err => console.log(err.stack))
 }
 
-function changeName(id, nume_nou){
+function changeName(id, new_name){
     return (async () => {
         const client = await pool.connect() // o sa ne folosim de client pentru a ne conecta la baza de date (pool este definit in databasepg.js)
         let Response = {
@@ -152,7 +164,7 @@ function changeName(id, nume_nou){
         }
 
         try {
-            const data = await client.query(`UPDATE public.users SET name='${nume_nou}' WHERE id='${id}'`);  // facem query spre baza de date, si raspunsul bazei de date il stocam in data
+            const data = await client.query(`UPDATE public.users SET name='${new_name}' WHERE id='${id}'`);  // facem query spre baza de date, si raspunsul bazei de date il stocam in data
             if(data != undefined && data.rowCount != 0){
                 Response.content = "success"
                 Response.error = false
@@ -167,8 +179,40 @@ function changeName(id, nume_nou){
     })().catch(err => console.log(err.stack))
 }
 
+function validateToken(id, token){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
+
+        try {
+            const data = await client.query(`SELECT * FROM users WHERE id='${id}'`);
+            const arr = data.rows[0];
+
+            if(arr === undefined){
+                Response.code = 8;
+                Response.content = `ID not found: ${id}`;
+            } else if (token != arr.auth_token){
+                Response.code = 16;
+                Response.content = `Token not valid`;
+            }
+            else{
+                Response.error=false;
+                Response.content='Token is valid';
+                Response.code=0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
 
 
 
-
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName}
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken}

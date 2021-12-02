@@ -35,6 +35,11 @@ const server = http.createServer(async function(req, res) {
         jsonResponse = await accountFunctions.loginAccount(queryObject.email_address, queryObject.password);
         break;
 
+      case 'validate-token':
+        console.log(timestamp,"Case de validare token")
+        jsonResponse = await accountFunctions.validateToken(queryObject.id, queryObject.auth_token);
+      break;
+
       case 'getuser':
         console.log(timestamp,"Case de getuser")
         jsonResponse = await accountFunctions.retrieveUser(queryObject.email_address);
