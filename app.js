@@ -38,12 +38,13 @@ const server = http.createServer(async function(req, res) {
       case 'getuser':
         console.log(timestamp,"Case de getuser")
         jsonResponse = await accountFunctions.retrieveUser(queryObject.email_address);
-        console.log("\t----Response:",jsonResponse)
         break;
 
       case 'change-email':
         console.log(timestamp,"Case de change-email")
+          console.log(queryObject.id, queryObject.email_address)
         jsonResponse = await accountFunctions.changeEmail(queryObject.id, queryObject.email_address);
+
         break;
 
       case 'change-password':
