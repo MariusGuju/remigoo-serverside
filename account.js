@@ -324,5 +324,39 @@ function resetSuggestions(id_film){
     })().catch(err => console.log(err.stack))
 }
 
+function getMoviesByDate(date){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
 
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions}
+        try {
+            const data = await client.query(`SELECT * FROM public.schedule WHERE date='${date}'`);
+            const arr = data.rows;
+            let movies = [];
+            for( let i = 0; i < arr.length; i++){
+                movies[i] = arr[i].movie_title 
+            }
+            
+            if(arr[0] === undefined){
+                Response.code = 8;
+                Response.content = `No movies found in this date: ${date}`;
+            } else {
+                Response.error=false;
+                Response.content=movies;
+                Response.code=0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate}

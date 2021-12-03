@@ -74,6 +74,11 @@ const server = http.createServer(async function(req, res) {
         console.log(timestamp,"Case de reset suggestions")
         jsonResponse = await accountFunctions.resetSuggestions(queryObject.id);
         break;
+
+      case 'get-movies-by-date':
+        console.log(timestamp,"Case de get movies by date")
+        jsonResponse = await accountFunctions.getMoviesByDate(queryObject.date);
+        break;
     }
 
     res.write(jsonResponse==null ? 'Case unknown / doSomething' : jsonResponse)
