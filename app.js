@@ -47,19 +47,22 @@ const server = http.createServer(async function(req, res) {
 
       case 'change-email':
         console.log(timestamp,"Case de change-email")
-          console.log(queryObject.id, queryObject.email_address)
-        jsonResponse = await accountFunctions.changeEmail(queryObject.id, queryObject.email_address);
-
+        jsonResponse = await accountFunctions.changeEmail(queryObject.id, queryObject.email_address, queryObject.token);
         break;
 
       case 'change-password':
         console.log(timestamp,"Case de change-password")
-        jsonResponse = await accountFunctions.changePassword(queryObject.id, queryObject.password);
+        jsonResponse = await accountFunctions.changePassword(queryObject.id, queryObject.password, queryObject.token);
         break;
 
       case 'change-name':
         console.log(timestamp,"Case de change-name")
-        jsonResponse = await accountFunctions.changeName(queryObject.id, queryObject.name);
+        jsonResponse = await accountFunctions.changeName(queryObject.id, queryObject.name, queryObject.token);
+        break;
+
+      case 'remove-token':
+        console.log(timestamp,"Case de remove-token")
+        jsonResponse = await accountFunctions.removeToken(queryObject.email_address);
         break;
     }
 
