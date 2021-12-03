@@ -79,6 +79,11 @@ const server = http.createServer(async function(req, res) {
         console.log(timestamp,"Case de get movies by date")
         jsonResponse = await accountFunctions.getMoviesByDate(queryObject.date);
         break;
+
+      case 'add-movie':
+        console.log(timestamp,"Case de add movie")
+        jsonResponse = await accountFunctions.addMovie(queryObject.title, queryObject.year, queryObject.genre, queryObject.duration, queryObject.trailer_link);
+        break;  
     }
 
     res.write(jsonResponse==null ? 'Case unknown / doSomething' : jsonResponse)

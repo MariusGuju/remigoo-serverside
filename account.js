@@ -358,5 +358,34 @@ function getMoviesByDate(date){
     })().catch(err => console.log(err.stack))
 }
 
+function addMovie(title, year, genre, duration, trailer_link){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 2,
+            content: "database error"
+        }
+        try {
+            const data = await client.query(`SELECT * FROM movies WHERE title='${title}'`);
+            const arr = data.rows;
 
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate}
+            if(arr.length != 0){
+                Response.code= 21;
+                Response.content= 'Movie already exists';
+
+            } else {
+                await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}');`)
+                Response.error=false;
+                Response.content='success';
+                Response.code=0;
+            }
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate, addMovie}
