@@ -64,6 +64,16 @@ const server = http.createServer(async function(req, res) {
         console.log(timestamp,"Case de remove-token")
         jsonResponse = await accountFunctions.removeToken(queryObject.email_address);
         break;
+
+      case 'getsuggests':
+        console.log(timestamp,"Case de get suggestions")
+        jsonResponse = await accountFunctions.getSuggestions(queryObject.id);
+        break;
+
+      case 'resetsuggests':
+        console.log(timestamp,"Case de reset suggestions")
+        jsonResponse = await accountFunctions.resetSuggestions(queryObject.id);
+        break;
     }
 
     res.write(jsonResponse==null ? 'Case unknown / doSomething' : jsonResponse)

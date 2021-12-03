@@ -268,5 +268,61 @@ function removeToken(email_address){
     })().catch(err => console.log(err.stack))
 }
 
+function getSuggestions(id_film){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
 
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken}
+        try {
+            const data = await client.query(`SELECT * FROM public.movies WHERE id='${id_film}'`);
+            const arr = data.rows[0];
+
+            if(arr === undefined){
+                Response.code = 8;
+                Response.content = `ID not found: ${id_film}`;
+            } else {
+                Response.error=false;
+                Response.content=Number(arr.suggestions);
+                Response.code=0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+function resetSuggestions(id_film){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
+
+        try {
+            const data = await client.query(`UPDATE public.movies SET suggestions=0 WHERE id='${id_film}'`);  
+
+            if(data != undefined && data.rowCount != 0){
+                Response.content = "success"
+                Response.error = false
+                Response.code = 0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions}
