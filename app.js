@@ -83,7 +83,13 @@ const server = http.createServer(async function(req, res) {
       case 'add-movie':
         console.log(timestamp,"Case de add movie")
         jsonResponse = await accountFunctions.addMovie(queryObject.title, queryObject.year, queryObject.genre, queryObject.duration, queryObject.trailer_link);
-        break;  
+        break;
+
+      case 'get-movies':
+        console.log(timestamp,"Case de get movies")
+        jsonResponse = await accountFunctions.getMovies(queryObject.title);
+        break;
+
     }
 
     res.write(jsonResponse==null ? 'Case unknown / doSomething' : jsonResponse)

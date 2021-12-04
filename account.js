@@ -82,13 +82,17 @@ function retrieveUser(email_address){
         try {
             const data = await client.query(`SELECT * FROM users WHERE email_address='${email_address}'`);
             const arr = data.rows[0];
-
             if(arr === undefined){
                 Response.code = 8;
                 Response.content = `Email not found: ${email_address}`;
-            } else {
+            }
+            else {
                 Response.error=false;
-                Response.content='success';
+                Response.content= {
+                    userName: arr.name,
+                    userEmail: arr.email_address,
+                    userId: arr.id
+                };
                 Response.code=0;
             }
 
@@ -338,9 +342,9 @@ function getMoviesByDate(date){
             const arr = data.rows;
             let movies = [];
             for( let i = 0; i < arr.length; i++){
-                movies[i] = arr[i].movie_title 
+                movies[i] = arr[i].movie_title
             }
-            
+
             if(arr[0] === undefined){
                 Response.code = 8;
                 Response.content = `No movies found in this date: ${date}`;
@@ -388,4 +392,53 @@ function addMovie(title, year, genre, duration, trailer_link){
 }
 
 
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate, addMovie}
+function getMovies(title){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 15 ,
+            content: "database error"
+        }
+        try {
+            const data = await client.query(`SELECT * FROM movies WHERE title='${title}'`);
+            const arr = data.rows;
+
+            const data2 = await client.query(`SELECT * FROM schedule WHERE movie_title='${title}'`);
+            const arr2 = data2.rows;
+
+
+            let Dates = new Set();
+            for( let i = 0; i < arr2.length; i++) {
+                Dates.add(arr2[i].date) ;
+            }
+            console.log(Dates.values())
+
+            let movies = {
+                Title: arr[0].title,
+                Image: arr[0].img,
+                Year: arr[0].year,
+                Genre: arr[0].genre,
+                Duration: arr[0].duration,
+                Suggestions: arr[0].suggestions,
+                Dates: Array.from(Dates)
+            };
+
+            if(arr.length === 0){
+                Response.code= 21;
+                Response.content= 'Movie does not exist';
+
+            } else {
+                Response.error=false;
+                Response.content=movies;
+                Response.code=0;
+            }
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate, addMovie, getMovies}
