@@ -1,9 +1,10 @@
 {
   "dependencies": {
     "deasync": "^0.1.24",
+    "express": "^4.17.1",
     "pg": "^8.7.1"
   },
-  "name": "tw",
+  "name": "app.js",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
@@ -12,5 +13,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MariusGuju/remigoo-serverside.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MariusGuju/remigoo-serverside/issues"
+  },
+  "homepage": "https://github.com/MariusGuju/remigoo-serverside#readme",
   "description": ""
 }

@@ -1,106 +1,115 @@
-const http = require('http')
-const url = require('url')
-const pool = require('./databasepg')
+const express = require('express')
+const app = express()
 const accountFunctions = require('./account')
 const port = 3000
 
 
-const server = http.createServer(async function(req, res) {
-    
-    // control for favicon
-    if (req.url === '/favicon.ico') {
-        res.writeHead(200, {'Content-Type': 'image/x-icon'} );
-        res.end();
-        return;
-    }
 
-    const queryObject = url.parse(req.url,true).query;   // url query
-
-    // exemplu de query http://localhost:3000/page?type=getuser&email_address=flo29@yahoo.com
-    // un queryObject.type va returna getuser, queryObject.email_address va returna flo29@yahoo.com s.a.m.d.
-
-
-    var jsonResponse = null;
+app.get('/getuser', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-
-    switch(queryObject.type){
-      case 'signup':
-        console.log(timestamp,"Case de signup")
-        jsonResponse = await accountFunctions.createAccount(queryObject.name, queryObject.password, queryObject.email_address, queryObject.date_of_birth);
-        break;
-
-      case 'login':
-        console.log(timestamp,"Case de login")
-        jsonResponse = await accountFunctions.loginAccount(queryObject.email_address, queryObject.password);
-        break;
-
-      case 'validate-token':
-        console.log(timestamp,"Case de validare token")
-        jsonResponse = await accountFunctions.validateToken(queryObject.id, queryObject.auth_token);
-      break;
-
-      case 'getuser':
-        console.log(timestamp,"Case de getuser")
-        jsonResponse = await accountFunctions.retrieveUser(queryObject.email_address);
-        break;
-
-      case 'change-email':
-        console.log(timestamp,"Case de change-email")
-        jsonResponse = await accountFunctions.changeEmail(queryObject.id, queryObject.email_address, queryObject.token);
-        break;
-
-      case 'change-password':
-        console.log(timestamp,"Case de change-password")
-        jsonResponse = await accountFunctions.changePassword(queryObject.id, queryObject.password, queryObject.token);
-        break;
-
-      case 'change-name':
-        console.log(timestamp,"Case de change-name")
-        jsonResponse = await accountFunctions.changeName(queryObject.id, queryObject.name, queryObject.token);
-        break;
-
-      case 'remove-token':
-        console.log(timestamp,"Case de remove-token")
-        jsonResponse = await accountFunctions.removeToken(queryObject.email_address);
-        break;
-
-      case 'getsuggests':
-        console.log(timestamp,"Case de get suggestions")
-        jsonResponse = await accountFunctions.getSuggestions(queryObject.id);
-        break;
-
-      case 'resetsuggests':
-        console.log(timestamp,"Case de reset suggestions")
-        jsonResponse = await accountFunctions.resetSuggestions(queryObject.id);
-        break;
-
-      case 'get-movies-by-date':
-        console.log(timestamp,"Case de get movies by date")
-        jsonResponse = await accountFunctions.getMoviesByDate(queryObject.date);
-        break;
-
-      case 'add-movie':
-        console.log(timestamp,"Case de add movie")
-        jsonResponse = await accountFunctions.addMovie(queryObject.title, queryObject.year, queryObject.genre, queryObject.duration, queryObject.trailer_link);
-        break;
-
-      case 'get-movies':
-        console.log(timestamp,"Case de get movies")
-        jsonResponse = await accountFunctions.getMovies(queryObject.title);
-        break;
-
-    }
-
-    res.write(jsonResponse==null ? 'Case unknown / doSomething' : jsonResponse)
-    res.end()
-
+    console.log(timestamp, "Case de get user")
+    const jsonResponse = await accountFunctions.retrieveUser(req.query.email_address);
+    res.send(jsonResponse)
 })
 
-server.listen(port, function(error) {
-    if(error){
-        console.log('Something went wrong', error)
-    } else {
-        console.log('Sever is listening on port ' + port)
-    }
+app.get('/signup', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de signup")
+    const jsonResponse = await accountFunctions.createAccount(req.query.name, req.query.password, req.query.email_address,req.query.date_of_birth);
+    res.send(jsonResponse)
+})
+
+app.get('/login', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de login")
+    const jsonResponse = await accountFunctions.loginAccount(req.query.email_address, req.query.password);
+    res.send(jsonResponse)
+})
+
+app.get('/validate-token', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de validare token")
+    const  jsonResponse = await accountFunctions.validateToken(req.query.id, req.query.auth_token);
+    res.send(jsonResponse)
+})
+
+app.get('/change-email', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de change-email")
+    const jsonResponse = await accountFunctions.changeEmail(req.query.id, req.query.email_address, req.query.token);
+    res.send(jsonResponse)
+})
+
+app.get('/change-password', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de change-password")
+    const jsonResponse = await accountFunctions.changePassword(req.query.id, req.query.password, req.query.token);
+    res.send(jsonResponse)
+})
+
+app.get('/change-name', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de change-name")
+    const jsonResponse = await accountFunctions.changeName(req.query.id, req.query.name, req.query.token);
+    res.send(jsonResponse)
+})
+
+app.get('/remove-token', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de remove-token")
+    const jsonResponse = await accountFunctions.removeToken(req.query.email_address);
+    res.send(jsonResponse)
+})
+
+
+app.get('/getsuggests', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get suggestions")
+    const jsonResponse = await accountFunctions.getSuggestions(req.query.id);
+    res.send(jsonResponse)
+})
+
+app.get('/resetsuggests', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get suggestions")
+    const jsonResponse = await accountFunctions.resetSuggestions(req.query.id);
+    res.send(jsonResponse)
+})
+
+app.get('/get-movies-by-date', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get movies by date")
+    const jsonResponse = await accountFunctions.getMoviesByDate(req.query.date);
+    res.send(jsonResponse)
+})
+
+app.get('/add-movie', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de add movie")
+    const jsonResponse = await accountFunctions.addMovie(req.query.title, req.query.year, req.query.genre, req.query.duration, req.query.trailer_link);
+    res.send(jsonResponse)
+})
+
+app.get('/get-movies', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get movies")
+    const jsonResponse = await accountFunctions.getMovies(req.query.title);
+    res.send(jsonResponse)
+})
+
+app.listen(port, () => {
+    console.log(`Sever is listening on port ${port}`)
 })
