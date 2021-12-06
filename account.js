@@ -362,7 +362,7 @@ function getMoviesByDate(date){
     })().catch(err => console.log(err.stack))
 }
 
-function addMovie(title, year, genre, duration, trailer_link){
+function addMovie(title, year, genre, duration, trailer_link, data){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -371,15 +371,18 @@ function addMovie(title, year, genre, duration, trailer_link){
             content: "database error"
         }
         try {
-            const data = await client.query(`SELECT * FROM movies WHERE title='${title}'`);
-            const arr = data.rows;
+            const temp = await client.query(`SELECT * FROM movies WHERE title='${title}'`);
+            const arr = temp.rows;
 
             if(arr.length != 0){
                 Response.code= 21;
                 Response.content= 'Movie already exists';
 
             } else {
-                await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}');`)
+                console.log(data)
+                const data2 = await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('hex')}');`)
+                console.log(data2)
+                console.log("zzz")
                 Response.error=false;
                 Response.content='success';
                 Response.code=0;
@@ -441,4 +444,38 @@ function getMovies(title){
 }
 
 
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate, addMovie, getMovies}
+function getImageFromMovie(title){
+    return (async () => {
+        const client = await pool.connect()
+        let arr;
+        let Response = {
+            error:true,
+            code: 15 ,
+            content: "database error"
+        }
+        try {
+            const data = await client.query(`SELECT img FROM movies WHERE title='${title}'`);
+
+
+            arr = data.rows[0];
+
+
+            if(arr.length === 0){
+                Response.code= 21;
+                Response.content= 'image does not exist';
+
+            } else {
+                Response.error=false;
+                Response.content=movies;
+                Response.code=0;
+            }
+        } finally {
+            client.release()
+            return arr.img;
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, getSuggestions, resetSuggestions, getMoviesByDate, addMovie, getMovies, getImageFromMovie}

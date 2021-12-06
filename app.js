@@ -1,9 +1,11 @@
 const express = require('express')
+const fileUpload = require('express-fileupload');
 const app = express()
 const accountFunctions = require('./account')
+const {json} = require("express");
 const port = 3000
 
-
+app.use(fileUpload());
 
 app.get('/getuser', async (req, res) => {
     let date = new Date();
@@ -94,13 +96,24 @@ app.get('/get-movies-by-date', async (req, res) => {
     res.send(jsonResponse)
 })
 
-app.get('/add-movie', async (req, res) => {
+app.post('/add-movie', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    let img = req.files.image.data
     console.log(timestamp, "Case de add movie")
-    const jsonResponse = await accountFunctions.addMovie(req.query.title, req.query.year, req.query.genre, req.query.duration, req.query.trailer_link);
+    const jsonResponse = await accountFunctions.addMovie(req.query.title, req.query.year, req.query.genre, req.query.duration, req.query.trailer_link, img);
     res.send(jsonResponse)
 })
+
+app.get('/get-image-from-movie', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get image from movie")
+    const jsonResponse = await accountFunctions.getImageFromMovie(req.query.title);
+    let buffer = Buffer.from(jsonResponse, "hex")
+    res.end(buffer)
+})
+
 
 app.get('/get-movies', async (req, res) => {
     let date = new Date();
