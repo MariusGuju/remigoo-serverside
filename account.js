@@ -1,4 +1,5 @@
 const pool = require('./databasepg')
+fs = require('fs');
 
 function createAccount(name, password, email_address, date_of_birth){
     return (async () => {
@@ -379,7 +380,11 @@ function addMovie(title, year, genre, duration, trailer_link, data){
                 Response.content= 'Movie already exists';
 
             } else {
-                console.log(data)
+                console.log(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`)
+                fs.writeFile('helloworld.txt', `INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`, function (err) {
+                    if (err) return console.log(err);
+                    console.log('Hello World > helloworld.txt');
+                });
                 const data2 = await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`)
                 console.log(data2)
                 console.log("zzz")
@@ -394,7 +399,6 @@ function addMovie(title, year, genre, duration, trailer_link, data){
     })().catch(err => console.log(err.stack))
 }
 
-
 function getMovies(title){
     return (async () => {
         const client = await pool.connect()
@@ -404,28 +408,26 @@ function getMovies(title){
             content: "database error"
         }
         try {
-            const data = await client.query(`SELECT * FROM movies WHERE title='${title}'`);
+            const query = `
+            SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Schedule.date
+                FROM Movies
+                INNER JOIN Schedule ON Schedule.id = Movies.id
+                where UPPER(Movies.title) LIKE '%' || UPPER('${title}') || '%';
+            `
+            const data = await client.query(query);
             const arr = data.rows;
+            let result = {}
 
-            const data2 = await client.query(`SELECT * FROM schedule WHERE movie_title='${title}'`);
-            const arr2 = data2.rows;
+            arr.forEach((movie)=>{
+                if(result[movie.id]){
+                    result[movie.id].dates.push(movie.date)
+                }
+                else{
+                    result[movie.id] = movie
+                    result[movie.id].dates = [movie.date]
+                }
+            })
 
-
-            let Dates = new Set();
-            for( let i = 0; i < arr2.length; i++) {
-                Dates.add(arr2[i].date) ;
-            }
-            console.log(Dates.values())
-
-            let movies = {
-                Title: arr[0].title,
-                Image: arr[0].img,
-                Year: arr[0].year,
-                Genre: arr[0].genre,
-                Duration: arr[0].duration,
-                Suggestions: arr[0].suggestions,
-                Dates: Array.from(Dates)
-            };
 
             if(arr.length === 0){
                 Response.code= 21;
@@ -433,7 +435,7 @@ function getMovies(title){
 
             } else {
                 Response.error=false;
-                Response.content=movies;
+                Response.content=result;
                 Response.code=0;
             }
         } finally {
@@ -442,7 +444,6 @@ function getMovies(title){
         }
     })().catch(err => console.log(err.stack))
 }
-
 
 function getImageFromMovie(title){
     return (async () => {

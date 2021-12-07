@@ -71,7 +71,6 @@ app.get('/remove-token', async (req, res) => {
     res.send(jsonResponse)
 })
 
-
 app.get('/getsuggests', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
