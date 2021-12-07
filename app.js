@@ -110,7 +110,7 @@ app.get('/get-image-from-movie', async (req, res) => {
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get image from movie")
     const jsonResponse = await accountFunctions.getImageFromMovie(req.query.title);
-    let buffer = Buffer.from(jsonResponse, "hex")
+    let buffer = Buffer.from(jsonResponse, "base64")
     res.end(buffer)
 })
 

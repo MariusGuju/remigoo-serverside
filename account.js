@@ -380,7 +380,7 @@ function addMovie(title, year, genre, duration, trailer_link, data){
 
             } else {
                 console.log(data)
-                const data2 = await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('hex')}');`)
+                const data2 = await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`)
                 console.log(data2)
                 console.log("zzz")
                 Response.error=false;
