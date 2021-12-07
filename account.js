@@ -409,25 +409,30 @@ function getMovies(title){
         }
         try {
             const query = `
-            SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Schedule.date
+            SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Schedule.date,Movies.img
                 FROM Movies
                 INNER JOIN Schedule ON Schedule.id = Movies.id
                 where UPPER(Movies.title) LIKE '%' || UPPER('${title}') || '%';
             `
             const data = await client.query(query);
             const arr = data.rows;
-            let result = {}
 
+            let catalog = {}
             arr.forEach((movie)=>{
-                if(result[movie.id]){
-                    result[movie.id].dates.push(movie.date)
+                if(catalog[movie.id]){
+                    catalog[movie.id].dates.push(movie.date)
                 }
                 else{
-                    result[movie.id] = movie
-                    result[movie.id].dates = [movie.date]
+                    catalog[movie.id] = movie
+                    catalog[movie.id].dates = [movie.date]
                 }
             })
 
+            var result = []
+
+            for(let key in catalog){
+                result.push(catalog[key])
+            }
 
             if(arr.length === 0){
                 Response.code= 21;
