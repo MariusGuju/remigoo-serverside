@@ -2,6 +2,7 @@ const express = require('express')
 const fileUpload = require('express-fileupload');
 const app = express()
 const accountFunctions = require('./account')
+const movieFunctions = require('./movies')
 const {json} = require("express");
 const port = 3000
 
@@ -75,7 +76,7 @@ app.get('/getsuggests', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get suggestions")
-    const jsonResponse = await accountFunctions.getSuggestions(req.query.id);
+    const jsonResponse = await movieFunctions.getSuggestions(req.query.id);
     res.send(jsonResponse)
 })
 
@@ -83,7 +84,7 @@ app.get('/resetsuggests', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get suggestions")
-    const jsonResponse = await accountFunctions.resetSuggestions(req.query.id);
+    const jsonResponse = await movieFunctions.resetSuggestions(req.query.id);
     res.send(jsonResponse)
 })
 
@@ -91,7 +92,7 @@ app.get('/get-movies-by-date', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get movies by date")
-    const jsonResponse = await accountFunctions.getMoviesByDate(req.query.date);
+    const jsonResponse = await movieFunctions.getMoviesByDate(req.query.date);
     res.send(jsonResponse)
 })
 
@@ -100,7 +101,7 @@ app.post('/add-movie', async (req, res) => {
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     let img = req.files.image.data
     console.log(timestamp, "Case de add movie")
-    const jsonResponse = await accountFunctions.addMovie(req.query.title, req.query.year, req.query.genre, req.query.duration, req.query.trailer_link, img);
+    const jsonResponse = await movieFunctions.addMovie(req.query.title, req.query.year, req.query.genre, req.query.duration, req.query.trailer_link, img);
     res.send(jsonResponse)
 })
 
@@ -108,7 +109,7 @@ app.get('/get-image-from-movie', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get image from movie")
-    const jsonResponse = await accountFunctions.getImageFromMovie(req.query.title);
+    const jsonResponse = await movieFunctions.getImageFromMovie(req.query.title);
     let buffer = Buffer.from(jsonResponse, "base64")
     res.end(buffer)
 })
@@ -118,7 +119,7 @@ app.get('/get-movies', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get movies")
-    const jsonResponse = await accountFunctions.getMovies(req.query.title);
+    const jsonResponse = await movieFunctions.getMovies(req.query.title);
     res.send(jsonResponse)
 })
 
