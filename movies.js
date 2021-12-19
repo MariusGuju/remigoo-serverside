@@ -2,18 +2,14 @@ const pool = require('./databasepg')
 fs = require('fs');
 const S3 = require('aws-sdk/clients/s3');
 const AWS = require('aws-sdk');
-const {Storage} = require('@google-cloud/storage');
-const amazonEndpoint = new AWS.Endpoint('s3.eu-central-1.amazonaws.com');
 
+const amazonEndpoint = new AWS.Endpoint('s3.eu-central-1.amazonaws.com');
 const accessKeyId = 'AKIAUEF23F7HBMPH3P7S';
 const secretAccessKey = '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';
 
 
 
-var storage = new Storage({
-    projectId: 'remigoo',
-    keyFilename: 'remigoo-firebase-adminsdk-mjh24-82e313c25f.json'
-});
+
 
 const s3 = new S3({
     endpoint: amazonEndpoint,
@@ -207,10 +203,6 @@ function getMovies(title){
             code: 15 ,
             content: "database error"
         }
-        let params = {
-            Bucket: "remigoo",
-            Key: "file-name.png",
-        };
         try {
             const query = `
             SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Schedule.date,Movies.img
