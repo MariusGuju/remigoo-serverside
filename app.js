@@ -83,8 +83,15 @@ app.get('/getsuggests', async (req, res) => {
 app.get('/resetsuggests', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-    console.log(timestamp, "Case de get suggestions")
+    console.log(timestamp, "Case de reset suggestions")
     const jsonResponse = await movieFunctions.resetSuggestions(req.query.id);
+    res.send(jsonResponse)
+})
+app.get('/increment-suggestions', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de increment suggestions")
+    const jsonResponse = await movieFunctions.incrementSuggestions(req.query.id);
     res.send(jsonResponse)
 })
 

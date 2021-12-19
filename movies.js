@@ -74,6 +74,33 @@ function resetSuggestions(id_film){
     })().catch(err => console.log(err.stack))
 }
 
+function incrementSuggestions(id_film){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
+
+        try {
+            const data = await client.query(`UPDATE public.movies SET suggestions=suggestions+1 WHERE id='${id_film}'`);
+            if(data != undefined && data.rowCount != 0){
+                Response.content = "success"
+                Response.error = false
+                Response.code = 0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+
+}
+
+
 function getMoviesByDate(date){
     return (async () => {
         const client = await pool.connect()
@@ -298,5 +325,4 @@ function getImageFromMovie(title){
 
 
 
-
-module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, getMovies, getImageFromMovie}
+module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, getMovies, getImageFromMovie, incrementSuggestions}
