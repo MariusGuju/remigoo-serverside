@@ -84,19 +84,26 @@ function getMoviesByDate(date){
         }
 
         try {
-            const data = await client.query(`SELECT * FROM public.schedule WHERE date='${date}'`);
-            const arr = data.rows;
-            let movies = [];
-            for( let i = 0; i < arr.length; i++){
-                movies[i] = arr[i].movie_title
-            }
 
-            if(arr[0] === undefined){
-                Response.code = 8;
-                Response.content = `No movies found in this date: ${date}`;
+            const query = `
+            SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
+                FROM Movies
+                RIGHT JOIN Schedule ON Schedule.id = Movies.id
+                where date='${date}'
+            `
+            const data = await client.query(query);
+
+            const arr = data.rows;
+
+
+
+            if(arr.length === 0){
+                Response.code= 21;
+                Response.content= 'Movie does not exist';
+
             } else {
                 Response.error=false;
-                Response.content=movies;
+                Response.content=arr;
                 Response.code=0;
             }
 
