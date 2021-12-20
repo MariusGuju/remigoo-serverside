@@ -142,41 +142,6 @@ function getMoviesByDate(date){
     })().catch(err => console.log(err.stack))
 }
 
-// function addMovie(title, year, genre, duration, trailer_link, data){
-//     return (async () => {
-//         const client = await pool.connect()
-//         let Response = {
-//             error:true,
-//             code: 2,
-//             content: "database error"
-//         }
-//         try {
-//             const temp = await client.query(`SELECT * FROM movies WHERE title='${title}'`);
-//             const arr = temp.rows;
-//
-//             if(arr.length != 0){
-//                 Response.code= 21;
-//                 Response.content= 'Movie already exists';
-//
-//             } else {
-//                 console.log(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`)
-//                 fs.writeFile('helloworld.txt', `INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`, function (err) {
-//                     if (err) return console.log(err);
-//                     console.log('Hello World > helloworld.txt');
-//                 });
-//                 const data2 = await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', '${data.toString('base64')}');`)
-//                 console.log(data2)
-//                 console.log("zzz")
-//                 Response.error=false;
-//                 Response.content='success';
-//                 Response.code=0;
-//             }
-//         } finally {
-//             client.release()
-//             return JSON.stringify(Response);
-//         }
-//     })().catch(err => console.log(err.stack))
-// }
 
 function addMovie(title, year, genre, duration, trailer_link, data){
     return (async () => {
@@ -227,6 +192,28 @@ function addMovie(title, year, genre, duration, trailer_link, data){
 }
 
 
+
+function scheduleMovie( movie_title, hall, time, date, id, prices){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 2,
+            content: "database error"
+        }
+        try {
+            const data = await client.query(`INSERT INTO schedule(movie_title, hall, time, date, id, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}', '${id}', '${prices}')`);
+            if(data != undefined && data.rowCount != 0){
+                Response.content = "success"
+                Response.error = false
+                Response.code = 0;
+            }
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+        }
+    })().catch(err => console.log(err.stack))
+}
 
 
 function getMovies(title){
@@ -325,4 +312,4 @@ function getImageFromMovie(title){
 
 
 
-module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, getMovies, getImageFromMovie, incrementSuggestions}
+module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getImageFromMovie, incrementSuggestions}
