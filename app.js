@@ -8,14 +8,7 @@ const port = 3000
 
 app.use(fileUpload());
 
-app.get('/getuser', async (req, res) => {
-    let date = new Date();
-    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-    console.log(timestamp, "Case de get user")
-    const jsonResponse = await accountFunctions.retrieveUser(req.query.email_address);
-    res.send(jsonResponse)
-})
-
+//Login & Signup requests
 app.get('/signup', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
@@ -32,11 +25,29 @@ app.get('/login', async (req, res) => {
     res.send(jsonResponse)
 })
 
+//Token requests (on page refresh)
 app.get('/validate-token', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de validare token")
     const  jsonResponse = await accountFunctions.validateToken(req.query.id, req.query.auth_token);
+    res.send(jsonResponse)
+})
+
+app.get('/remove-token', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de remove-token")
+    const jsonResponse = await accountFunctions.removeToken(req.query.email_address);
+    res.send(jsonResponse)
+})
+
+//Profile page requests
+app.get('/getuser', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get user")
+    const jsonResponse = await accountFunctions.retrieveUser(req.query.email_address);
     res.send(jsonResponse)
 })
 
@@ -64,12 +75,31 @@ app.get('/change-name', async (req, res) => {
     res.send(jsonResponse)
 })
 
-app.get('/remove-token', async (req, res) => {
+//Movies requests
+//getters
+app.get('/get-movies-by-date', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-    console.log(timestamp, "Case de remove-token")
-    const jsonResponse = await accountFunctions.removeToken(req.query.email_address);
+    console.log(timestamp, "Case de get movies by date")
+    const jsonResponse = await movieFunctions.getMoviesByDate(req.query.date);
     res.send(jsonResponse)
+})
+
+app.get('/get-movies', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get movies")
+    const jsonResponse = await movieFunctions.getMovies(req.query.title);
+    console.log("gata")
+    res.send(jsonResponse)
+})
+
+app.get('/get-image-from-movie', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get image from movie")
+    const jsonResponse = await movieFunctions.getImageFromMovie(req.query.title);
+    res.end(jsonResponse)
 })
 
 app.get('/getsuggests', async (req, res) => {
@@ -80,6 +110,7 @@ app.get('/getsuggests', async (req, res) => {
     res.send(jsonResponse)
 })
 
+//actions
 app.get('/resetsuggests', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
@@ -87,6 +118,7 @@ app.get('/resetsuggests', async (req, res) => {
     const jsonResponse = await movieFunctions.resetSuggestions(req.query.id);
     res.send(jsonResponse)
 })
+
 app.get('/increment-suggestions', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
@@ -94,23 +126,6 @@ app.get('/increment-suggestions', async (req, res) => {
     const jsonResponse = await movieFunctions.incrementSuggestions(req.query.id);
     res.send(jsonResponse)
 })
-
-app.get('/get-movies-by-date', async (req, res) => {
-    let date = new Date();
-    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-    console.log(timestamp, "Case de get movies by date")
-    const jsonResponse = await movieFunctions.getMoviesByDate(req.query.date);
-    res.send(jsonResponse)
-})
-
-// app.post('/add-movie', async (req, res) => {
-//     let date = new Date();
-//     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-//     let img = req.files.image
-//     console.log(timestamp, "Case de add movie")
-//     const jsonResponse = await movieFunctions.addMovie(req.query.title, req.query.year, req.query.genre, req.query.duration, req.query.trailer_link, img);
-//     res.send(jsonResponse)
-// })
 
 app.post('/add-movie', async (req, res) => {
     let date = new Date();
@@ -126,25 +141,6 @@ app.get('/schedule-movie', async (req, res) => {
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de schedule movie")
     const jsonResponse = await movieFunctions.scheduleMovie( req.query.movie_title, req.query.hall, req.query.time, req.query.date,req.query.id, req.query.prices);
-    res.send(jsonResponse)
-})
-
-app.get('/get-image-from-movie', async (req, res) => {
-    let date = new Date();
-    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-    console.log(timestamp, "Case de get image from movie")
-    const jsonResponse = await movieFunctions.getImageFromMovie(req.query.title);
-    res.end(jsonResponse)
-})
-
-
-
-app.get('/get-movies', async (req, res) => {
-    let date = new Date();
-    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
-    console.log(timestamp, "Case de get movies")
-    const jsonResponse = await movieFunctions.getMovies(req.query.title);
-    console.log("gata")
     res.send(jsonResponse)
 })
 
