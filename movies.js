@@ -2,6 +2,7 @@ const pool = require('./databasepg')
 fs = require('fs');
 const S3 = require('aws-sdk/clients/s3');
 const AWS = require('aws-sdk');
+const {values} = require("pg/lib/native/query");
 
 const amazonEndpoint = new AWS.Endpoint('s3.eu-central-1.amazonaws.com');
 const accessKeyId = 'AKIAUEF23F7HBMPH3P7S';
@@ -113,15 +114,29 @@ function getMoviesByDate(date){
         try {
 
             const query = `
-            SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
+            SELECT DISTINCT ON(Schedule.time) Schedule.time, Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
                 FROM Movies
                 RIGHT JOIN Schedule ON Schedule.id = Movies.id
                 where date='${date}'
             `
             const data = await client.query(query);
-
+            const res = [];
             const arr = data.rows;
 
+
+            arr.forEach(function (value, i) {
+                let check = true;
+                res.forEach(function (item, index) {
+                    if(value.id == item.id){
+                        check=false;
+                    }
+                });
+                if(check) res.push(value)
+            });
+
+            res.forEach(function (value, index) {
+                value.time = getHours(value.id,arr)
+            });
 
 
             if(arr.length === 0){
@@ -130,7 +145,7 @@ function getMoviesByDate(date){
 
             } else {
                 Response.error=false;
-                Response.content=arr;
+                Response.content=res;
                 Response.code=0;
             }
 
@@ -142,6 +157,17 @@ function getMoviesByDate(date){
     })().catch(err => console.log(err.stack))
 }
 
+function getHours(itemID, arr){
+    let string = "";
+    arr.forEach(function (item, index) {
+        if(item.id == itemID && string == ""){
+            string = string  + item.time ;
+        }else if(item.id == itemID){
+            string = string + ", " + item.time
+        }
+    });
+    return string
+}
 
 function addMovie(title, year, genre, duration, trailer_link, data){
     return (async () => {
