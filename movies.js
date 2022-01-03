@@ -336,6 +336,65 @@ function getImageFromMovie(title){
 
 
 
+function setTrending(number, movie_ID){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 22,
+            content: "database error"
+        }
+
+        try {
+            const data = await client.query(`UPDATE public.trending SET "movie_ID"='${movie_ID}' WHERE number='${number}'`);
+
+            if(data != undefined && data.rowCount != 0){
+                Response.content = "success"
+                Response.error = false
+                Response.code = 0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+function getTrending(){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 22,
+            content: "database error"
+        }
+
+        try {
+            const data = await client.query(`SELECT id,title,year,img,genre,number FROM movies INNER JOIN trending ON cast(movies.id as bigint)=trending."movie_ID"`);
+            const trending = {};
+
+            data.rows.forEach(row => {
+                trending[row.number] = row;
+                delete trending[row.number].number;
+            });
+
+            if(data != undefined && data.rowCount != 0){
+                Response.content = trending
+                Response.error = false
+                Response.code = 0;
+            }
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
 
 
-module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getImageFromMovie, incrementSuggestions}
+
+
+module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getImageFromMovie, incrementSuggestions, setTrending, getTrending}

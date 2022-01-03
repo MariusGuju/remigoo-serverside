@@ -145,6 +145,23 @@ app.get('/schedule-movie', async (req, res) => {
 })
 
 
+app.get('/setTrending', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de set trending")
+    const jsonResponse = await movieFunctions.setTrending(req.query.number, req.query.movie_ID);
+    res.send(jsonResponse)
+})
+
+app.get('/getTrending', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get trending")
+    const jsonResponse = await movieFunctions.getTrending();
+    res.send(jsonResponse)
+})
+
+
 app.listen(port, () => {
     console.log(`Sever is listening on port ${port}`)
 })
