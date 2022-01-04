@@ -18,7 +18,7 @@ function createAccount(name, password, email_address, date_of_birth){
                 Response.content= 'Email already exists';
 
             } else {
-                await client.query(`INSERT INTO users(name, password, email_address, date_of_birth, panelAccess)VALUES('${name}', '${password}', '${email_address}', '${date_of_birth}', false);`)
+                await client.query(`INSERT INTO users(name, password, email_address, date_of_birth, "panelAccess")VALUES('${name}', '${password}', '${email_address}', '${date_of_birth}', false);`)
                 Response.error=false;
                 Response.content='success';
                 Response.code=0;
@@ -42,9 +42,9 @@ function loginAccount(email_address, password){
         try {
             const data = await client.query(`SELECT * FROM users WHERE email_address='${email_address}'`);
             const arr = data.rows[0];
+            console.log(arr)
 
-
-            if(arr != undefined && password != arr.password){
+            if(arr == undefined || password != arr.password){
                 Response.code=5;
                 Response.content='Wrong email or password ';
             }
