@@ -18,7 +18,7 @@ function createAccount(name, password, email_address, date_of_birth){
                 Response.content= 'Email already exists';
 
             } else {
-                await client.query(`INSERT INTO users(name, password, email_address, date_of_birth)VALUES('${name}', '${password}', '${email_address}', '${date_of_birth}');`)
+                await client.query(`INSERT INTO users(name, password, email_address, date_of_birth, panelAccess)VALUES('${name}', '${password}', '${email_address}', '${date_of_birth}', false);`)
                 Response.error=false;
                 Response.content='success';
                 Response.code=0;
@@ -226,6 +226,8 @@ function validateToken(id, token){
             const data = await client.query(`SELECT * FROM users WHERE id='${id}'`);
             const arr = data.rows[0];
 
+            Response.hasPanelAccess = arr.panelAccess;
+            
             if(arr === undefined){
                 Response.code = 8;
                 Response.content = `ID not found: ${id}`;
