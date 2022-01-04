@@ -116,7 +116,7 @@ function getMoviesByDate(date){
             const query = `
             SELECT DISTINCT ON(Schedule.time) Schedule.time, Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
                 FROM Movies
-                RIGHT JOIN Schedule ON Schedule.id = Movies.id
+                RIGHT JOIN Schedule ON Schedule.Movie_id = Movies.id
                 where date='${date}'
             `
             const data = await client.query(query);
@@ -151,6 +151,66 @@ function getMoviesByDate(date){
 
         } finally {
             client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+function getMoviesByID(ID){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
+
+        try {
+
+            //query pentru a gasi filmul doar
+            const query = `
+            SELECT *
+                FROM Movies
+                WHERE Movies.id='${ID}'
+            `
+
+            const data = await client.query(query);
+            const arr = data.rows[0];
+
+
+
+            //query pentru a gasi toate schedule de la film respectiv
+            const query2 = `
+            SELECT Schedule.id, Schedule.tickets, Schedule.date, Schedule.time, Schedule.hall
+                FROM Schedule
+                where Schedule.movie_id='${ID}'
+            `
+
+            const data2 = await client.query(query2);
+            const arr2 = data2.rows;
+
+            Response.content ={
+                movie: arr,
+                schedule: []
+            }
+
+            Response.content.schedule = arr2
+
+
+            if(data.rows.length === 0){
+                Response.code= 21;
+                Response.content= 'Movie does not exist';
+
+            } else {
+                Response.error=false;
+                Response.code=0;
+            }
+
+        } finally {
+            client.release()
+            console.log(Response)
             return JSON.stringify(Response);
 
         }
@@ -397,4 +457,4 @@ function getTrending(){
 
 
 
-module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getImageFromMovie, incrementSuggestions, setTrending, getTrending}
+module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getMoviesByID, getImageFromMovie, incrementSuggestions, setTrending, getTrending}

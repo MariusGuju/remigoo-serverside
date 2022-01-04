@@ -85,6 +85,14 @@ app.get('/get-movies-by-date', async (req, res) => {
     res.send(jsonResponse)
 })
 
+app.get('/get-movies-by-id', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get movies by id")
+    const jsonResponse = await movieFunctions.getMoviesByID(req.query.id);
+    res.send(jsonResponse)
+})
+
 app.get('/get-movies', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
