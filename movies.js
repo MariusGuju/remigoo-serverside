@@ -85,7 +85,7 @@ function incrementSuggestions(id_film){
         }
 
         try {
-            const data = await client.query(`UPDATE public.movies SET suggestions=suggestions+1 WHERE id='${id_film}'`);
+            const data = await client.query(`UPDATE public.movies SET suggestions =  suggestions::integer + 1 WHERE id='${id_film}'`);
             if(data != undefined && data.rowCount != 0){
                 Response.content = "success"
                 Response.error = false
