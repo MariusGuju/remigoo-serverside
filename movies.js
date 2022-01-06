@@ -561,8 +561,6 @@ function getAvailableHoursByDate(date){
                 }
 
             });
-            console.log(hoursFromHall1)
-            console.log(hoursFromHall2)
 
             hoursFromHall1 = allAvailableHours.filter(x => !hoursFromHall1.includes(x))
             hoursFromHall2 = allAvailableHours.filter(x => !hoursFromHall2.includes(x))
@@ -573,9 +571,6 @@ function getAvailableHoursByDate(date){
             if(hoursFromHall2.length === 0){
                 hoursFromHall1[0] = 'none'
             }
-
-            console.log(hoursFromHall1)
-            console.log(hoursFromHall2)
 
             Response.error=false;
             Response.content = {
