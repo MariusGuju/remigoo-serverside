@@ -602,7 +602,7 @@ function getTicketById(id){
             content: "database error"
         }
         try {
-            const data = await client.query(`SELECT name, movie_title, date, time, hall, prices, id, schedule_id, seats FROM tickets where id='${id}'`);
+            const data = await client.query(`SELECT * FROM tickets where id='${id}'`);
             const arr = data.rows[0];
 
             Response.content = arr;

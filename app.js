@@ -84,6 +84,7 @@ app.get('/change-age-category', async (req, res) => {
 })
 
 //Movies requests
+
 //getters
 app.get('/get-movies-by-date', async (req, res) => {
     let date = new Date();
