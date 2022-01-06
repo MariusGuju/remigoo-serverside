@@ -457,7 +457,7 @@ function getTrending(){
 
 
 
-function addTicket(nume, id, seats){
+function addTicket(nume, id, seats, user){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -471,13 +471,20 @@ function addTicket(nume, id, seats){
             const data = await client.query(`SELECT * FROM schedule WHERE schedule.id='${id}'`);
             let str = "{"
             const temp = data.rows[0];
-
-
-            for (let i = 0; i < seats.length; i++) {
-                if((temp.tickets[seats[i]-1])!=0){
+            if(typeof seats === 'object'){
+                for (let i = 0; i < seats.length; i++) {
+                    if((temp.tickets[seats[i]-1])!=0){
+                        check= false;
+                    }
+                }
+            }else if(typeof seats === 'string'){
+                if((temp.tickets[seats-1])!=0){
                     check= false;
                 }
             }
+            console.log(check)
+
+
 
             if(!check){
                 Response.code= 21;
@@ -485,26 +492,39 @@ function addTicket(nume, id, seats){
 
             } else {
 
-                for( let i = 0 ; i < seats.length ; i++ )
-                    str = str + seats[i] + (i === seats.length-1 ? "}" : ",")
+                if(typeof seats === 'object'){
+                    for( let i = 0 ; i < seats.length ; i++ )
+                        str = str + seats[i] + (i === seats.length-1 ? "}" : ",")
+                }else if(typeof seats === 'string'){
+                   str = str + seats + "}"
+                }
+
 
                 const data2 = await client.query(`INSERT INTO tickets(name, movie_title, date, "time", hall,  schedule_id, seats)VALUES ('${nume}', '${temp.movie_title}', '${temp.date}', '${temp.time}', '${temp.hall}', '${temp.id}', '${str}') RETURNING tickets.id;`)
 
-                for (let i = 0; i < seats.length; i++) {
-                    temp.tickets[seats[i]-1] = data2.rows[0].id
-
+                if(typeof seats === 'object'){
+                    for (let i = 0; i < seats.length; i++) {
+                        temp.tickets[seats[i]-1] = data2.rows[0].id
+                    }
+                }else if(typeof seats === 'string'){
+                    temp.tickets[seats-1] = data2.rows[0].id
                 }
-                console.log(temp.tickets)
+
+
                 str = "{"
                 for( let i = 0 ; i < temp.tickets.length ; i++ )
                     str = str + temp.tickets[i] + (i === temp.tickets.length-1 ? "}" : ",")
-                console.log(str)
+
 
                 const data3 = await client.query(`UPDATE schedule SET tickets = '${str}' WHERE schedule.id ='${id}' `)
 
+                if(user !== -1){
+                    const data4 = await client.query(`UPDATE users SET tickets = array_append(tickets, ${data2.rows[0].id}) WHERE id ='${user}' `)
+                }
+
 
                 Response.error=false;
-                Response.content='success';
+                Response.content=data2.rows[0].id;
                 Response.code=0;
             }
         } finally {
