@@ -550,8 +550,7 @@ function getAvailableHoursByDate(date){
         try {
             const data = await client.query(`SELECT * FROM public.schedule WHERE date='${date}'`);
             const arr = data.rows;
-            console.log(arr[0])
-
+            
 
             arr.forEach(function (value, index) {
                 if(value.hall === '1'){
