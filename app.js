@@ -75,6 +75,14 @@ app.get('/change-name', async (req, res) => {
     res.send(jsonResponse)
 })
 
+app.get('/change-age-category', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de change-age-category")
+    const jsonResponse = await accountFunctions.changeAgeCategory(req.query.id, req.query.age_category);
+    res.send(jsonResponse)
+})
+
 //Movies requests
 //getters
 app.get('/get-movies-by-date', async (req, res) => {

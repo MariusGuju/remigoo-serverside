@@ -18,7 +18,7 @@ function createAccount(name, password, email_address, date_of_birth){
                 Response.content= 'Email already exists';
 
             } else {
-                await client.query(`INSERT INTO users(name, password, email_address, date_of_birth, "panelAccess")VALUES('${name}', '${password}', '${email_address}', '${date_of_birth}', false);`)
+                await client.query(`INSERT INTO users(name, password, email_address, date_of_birth, "panelAccess", age_category)VALUES('${name}', '${password}', '${email_address}', '${date_of_birth}', false, 'standard');`)
                 Response.error=false;
                 Response.content='success';
                 Response.code=0;
@@ -92,7 +92,8 @@ function retrieveUser(email_address){
                 Response.content= {
                     userName: arr.name,
                     userEmail: arr.email_address,
-                    userId: arr.id
+                    userId: arr.id,
+                    userAgeCategory: arr.age_category
                 };
                 Response.code=0;
             }
@@ -276,7 +277,38 @@ function removeToken(email_address){
 }
 
 
+function changeAgeCategory(id, new_category){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 1,
+            content: "database error"
+        }
+
+        try {
+                var data = await client.query(`UPDATE public.users SET age_category='${new_category}' WHERE id='${id}'`);
+
+                if(data === undefined || data.rowCount === 0){
+                    Response.code = 10;
+                    Response.content = 'database error';
+
+                }
+                else {
+                    Response.error=false;
+                    Response.content='success';
+                    Response.code=0;
+                }
+
+        }
+        finally {
+            client.release() ;
+            return JSON.stringify(Response);
+        }
+    })().catch(err => console.log(err.stack))
+}
 
 
 
-module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken}
+
+module.exports = {retrieveUser, loginAccount, createAccount, changeEmail, changePassword, changeName, validateToken, removeToken, changeAgeCategory}
