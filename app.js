@@ -185,6 +185,14 @@ app.get('/add-ticket', async (req, res) => {
     res.send(jsonResponse)
 })
 
+app.get('/get-available-hours-by-date', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de add get available hours by date")
+    const jsonResponse = await movieFunctions.getAvailableHoursByDate(req.query.date);
+    res.send(jsonResponse)
+})
+
 
 app.listen(port, () => {
     console.log(`Sever is listening on port ${port}`)

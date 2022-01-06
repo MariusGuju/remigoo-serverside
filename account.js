@@ -58,7 +58,8 @@ function loginAccount(email_address, password){
                     token: token,
                     userEmail: arr.email_address,
                     userId: arr.id,
-                    userName: arr.name
+                    userName: arr.name,
+                    userAgeCategory: arr.age_category
                 };
                 Response.code=0;
 

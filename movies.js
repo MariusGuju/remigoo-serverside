@@ -114,7 +114,7 @@ function getMoviesByDate(date){
         try {
 
             const query = `
-            SELECT DISTINCT ON(Schedule.time) Schedule.time, Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
+            SELECT DISTINCT ON(Schedule.time) Schedule.time, Schedule.hall, Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
                 FROM Movies
                 RIGHT JOIN Schedule ON Schedule.Movie_id = Movies.id
                 where date='${date}'
@@ -122,6 +122,12 @@ function getMoviesByDate(date){
             const data = await client.query(query);
             const res = [];
             const arr = data.rows;
+
+
+            arr.forEach(function (value, index) {
+                value.time = value.time + "-" + value.hall
+                delete value['hall']
+            });
 
 
             arr.forEach(function (value, i) {
@@ -210,7 +216,7 @@ function getMoviesByID(ID){
 
         } finally {
             client.release()
-            console.log(Response)
+
             return JSON.stringify(Response);
 
         }
@@ -256,8 +262,6 @@ function addMovie(title, year, genre, duration, trailer_link, data){
                 const data2 = await client.query(`INSERT INTO movies(title, year, genre, duration, trailer_link, img)VALUES('${title}', '${year}', '${genre}', '${duration}', '${trailer_link}', 'https://remigoo.s3.eu-central-1.amazonaws.com/${title}.png');`)
 
 
-                console.log('aici')
-                console.log(data)
                 object_upload_params.Body=data;
                 object_upload_params.Key=title+'.png';
                 s3.putObject(object_upload_params, function (err, data) {
@@ -265,7 +269,6 @@ function addMovie(title, year, genre, duration, trailer_link, data){
                     else console.log(data);           // successful response
                 });
 
-                console.log("zzz")
                 Response.error=false;
                 Response.content='success';
                 Response.code=0;
@@ -482,7 +485,6 @@ function addTicket(nume, id, seats, user){
                     check= false;
                 }
             }
-            console.log(check)
 
 
 
@@ -534,6 +536,61 @@ function addTicket(nume, id, seats, user){
     })().catch(err => console.log(err.stack))
 }
 
+function getAvailableHoursByDate(date){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
+        let allAvailableHours = ['08:00','10:30','13:00','18:00','20:30','23:00']
+        let hoursFromHall1 = []
+        let hoursFromHall2 = []
+        try {
+            const data = await client.query(`SELECT * FROM public.schedule WHERE date='${date}'`);
+            const arr = data.rows;
+            console.log(arr[0])
 
 
-module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getMoviesByID, getImageFromMovie, incrementSuggestions, setTrending, getTrending, addTicket}
+            arr.forEach(function (value, index) {
+                if(value.hall === '1'){
+                    hoursFromHall1.push(value.time)
+                }else if(value.hall === '2'){
+                    hoursFromHall2.push(value.time)
+                }
+
+            });
+            console.log(hoursFromHall1)
+            console.log(hoursFromHall2)
+
+            hoursFromHall1 = allAvailableHours.filter(x => !hoursFromHall1.includes(x))
+            hoursFromHall2 = allAvailableHours.filter(x => !hoursFromHall2.includes(x))
+
+            if(hoursFromHall1.length === 0){
+                hoursFromHall1[0] = 'none'
+            }
+            if(hoursFromHall2.length === 0){
+                hoursFromHall1[0] = 'none'
+            }
+
+            console.log(hoursFromHall1)
+            console.log(hoursFromHall2)
+
+            Response.error=false;
+            Response.content = {
+                hall_1: hoursFromHall1,
+                hall_2: hoursFromHall2
+            };
+            Response.code=0;
+
+        } finally {
+            client.release()
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+
+module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getMoviesByID, getImageFromMovie, incrementSuggestions, setTrending, getTrending, addTicket, getAvailableHoursByDate}
