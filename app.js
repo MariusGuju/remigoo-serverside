@@ -152,13 +152,16 @@ app.post('/add-movie', async (req, res) => {
     res.send(jsonResponse)
 })
 
+
+
 app.get('/schedule-movie', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de schedule movie")
-    const jsonResponse = await movieFunctions.scheduleMovie( req.query.movie_title, req.query.hall, req.query.time, req.query.date,req.query.id, req.query.prices);
+    const jsonResponse = await movieFunctions.scheduleMovie( req.query.movie_title, req.query.hall, req.query.time, req.query.date,req.query.id, req.query.prices, req.query.movie_id);
     res.send(jsonResponse)
 })
+
 
 
 app.get('/setTrending', async (req, res) => {
@@ -190,6 +193,15 @@ app.get('/get-available-hours-by-date', async (req, res) => {
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de add get available hours by date")
     const jsonResponse = await movieFunctions.getAvailableHoursByDate(req.query.date);
+    res.send(jsonResponse)
+})
+
+
+app.get('/get-ticket-by-id', async (req, res) => {
+    let date = new Date();
+    let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
+    console.log(timestamp, "Case de get ticket by id")
+    const jsonResponse = await movieFunctions.getTicketById(req.query.id);
     res.send(jsonResponse)
 })
 

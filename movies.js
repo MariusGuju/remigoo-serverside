@@ -291,8 +291,7 @@ function addMovie(title, year, genre, duration, trailer_link, data){
 }
 
 
-
-function scheduleMovie( movie_title, hall, time, date, id, prices){
+function scheduleMovie( movie_title, hall, time, date, id, prices, movie_id){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -301,7 +300,7 @@ function scheduleMovie( movie_title, hall, time, date, id, prices){
             content: "database error"
         }
         try {
-            const data = await client.query(`INSERT INTO schedule(movie_title, hall, time, date, id, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}', '${id}', '${prices}')`);
+            const data = await client.query(`INSERT INTO schedule(movie_title, hall, time, date, movie_id, id, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}','${movie_id}', '${id}', '${prices}')`);
             if(data != undefined && data.rowCount != 0){
                 Response.content = "success"
                 Response.error = false
@@ -313,7 +312,6 @@ function scheduleMovie( movie_title, hall, time, date, id, prices){
         }
     })().catch(err => console.log(err.stack))
 }
-
 
 function getMovies(title){
     return (async () => {
@@ -595,5 +593,37 @@ function getAvailableHoursByDate(date){
 }
 
 
+function getTicketById(id){
+    return (async () => {
+        const client = await pool.connect()
+        let Response = {
+            error:true,
+            code: 11,
+            content: "database error"
+        }
+        try {
+            const data = await client.query(`SELECT name, movie_title, date, time, hall, prices, id, schedule_id, seats FROM tickets where id='${id}'`);
+            const arr = data.rows[0];
 
-module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getMoviesByID, getImageFromMovie, incrementSuggestions, setTrending, getTrending, addTicket, getAvailableHoursByDate}
+            Response.content = arr;
+
+            if(data.rows.length === 0){
+                Response.code= 21;
+                Response.content= 'Ticket does not exist';
+
+            } else {
+                Response.error=false;
+                Response.code=0;
+            }
+
+        } finally {
+            client.release()
+
+            return JSON.stringify(Response);
+
+        }
+    })().catch(err => console.log(err.stack))
+}
+
+module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getMoviesByID, getImageFromMovie, incrementSuggestions, setTrending, getTrending, addTicket, getAvailableHoursByDate, getTicketById}
+
