@@ -114,7 +114,7 @@ function getMoviesByDate(date){
         try {
 
             const query = `
-            SELECT DISTINCT ON(Schedule.time) Schedule.time, Schedule.hall, Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
+            SELECT DISTINCT ON(Schedule.time) Schedule.time, Schedule.hall, Schedule.tickets, Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Movies.img
                 FROM Movies
                 RIGHT JOIN Schedule ON Schedule.Movie_id = Movies.id
                 where date='${date}'
@@ -123,10 +123,20 @@ function getMoviesByDate(date){
             const res = [];
             const arr = data.rows;
 
-
+            console.log(arr)
+            let contor
             arr.forEach(function (value, index) {
                 value.time = value.time + "-" + value.hall
                 delete value['hall']
+                contor = 0
+                if(value.tickets != null){
+                    value.tickets.forEach(function (val, index) {
+                        if(val != 0) contor++
+                    })
+                    value.time = value.time + "-" + contor + "/84"
+                }else{
+                    value.time = value.time + "-0/84"
+                }
             });
 
 
@@ -460,7 +470,7 @@ function getTrending(){
 
 
 
-function addTicket(nume, id, seats, user){
+function addTicket(nume, id, seats, user, price){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -486,8 +496,6 @@ function addTicket(nume, id, seats, user){
                 }
             }
 
-
-
             if(!check){
                 Response.code= 21;
                 Response.content= 'Seat(s) taken';
@@ -502,7 +510,7 @@ function addTicket(nume, id, seats, user){
                 }
 
 
-                const data2 = await client.query(`INSERT INTO tickets(name, movie_title, date, "time", hall,  schedule_id, seats)VALUES ('${nume}', '${temp.movie_title}', '${temp.date}', '${temp.time}', '${temp.hall}', '${temp.id}', '${str}') RETURNING tickets.id;`)
+                const data2 = await client.query(`INSERT INTO tickets(name, movie_title, date, "time", hall,  schedule_id, seats, price)VALUES ('${nume}', '${temp.movie_title}', '${temp.date}', '${temp.time}', '${temp.hall}', '${temp.id}', '${str}', '${price}') RETURNING tickets.id;`)
 
                 if(typeof seats === 'object'){
                     for (let i = 0; i < seats.length; i++) {
@@ -550,7 +558,7 @@ function getAvailableHoursByDate(date){
         try {
             const data = await client.query(`SELECT * FROM public.schedule WHERE date='${date}'`);
             const arr = data.rows;
-            
+
 
             arr.forEach(function (value, index) {
                 if(value.hall === '1'){
@@ -585,6 +593,7 @@ function getAvailableHoursByDate(date){
         }
     })().catch(err => console.log(err.stack))
 }
+
 
 
 module.exports = {getSuggestions, resetSuggestions, getMoviesByDate, addMovie, scheduleMovie, getMovies, getMoviesByID, getImageFromMovie, incrementSuggestions, setTrending, getTrending, addTicket, getAvailableHoursByDate}

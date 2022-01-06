@@ -181,7 +181,7 @@ app.get('/add-ticket', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de add ticket")
-    const jsonResponse = await movieFunctions.addTicket(req.query.name, req.query.id, req.query.seats, req.query.user);
+    const jsonResponse = await movieFunctions.addTicket(req.query.name, req.query.id, req.query.seats, req.query.user, req.query.price);
     res.send(jsonResponse)
 })
 
