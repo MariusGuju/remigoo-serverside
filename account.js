@@ -84,6 +84,7 @@ function retrieveUser(email_address){
         try {
             const data = await client.query(`SELECT * FROM users WHERE email_address='${email_address}'`);
             const arr = data.rows[0];
+
             if(arr === undefined){
                 Response.code = 8;
                 Response.content = `Email not found: ${email_address}`;
@@ -94,8 +95,49 @@ function retrieveUser(email_address){
                     userName: arr.name,
                     userEmail: arr.email_address,
                     userId: arr.id,
-                    userAgeCategory: arr.age_category
+                    userAgeCategory: arr.age_category,
+                    tickets:{}
                 };
+
+                if(arr.tickets!=null){
+
+                    let schedule_ids = []
+                    const data2 = await client.query(`SELECT * FROM tickets WHERE id= ANY(ARRAY[${arr.tickets}]) `);
+
+                    data2.rows.forEach(function (value, index) {
+                       schedule_ids.push(value.schedule_id)
+                    });
+
+
+                    const query = `
+                    SELECT Movies.title, Movies.year, Movies.genre, Movies.duration, Schedule.date, Schedule.time
+                    FROM Movies
+                    RIGHT JOIN Schedule ON Schedule.Movie_title = Movies.title
+                    where Schedule.id=ANY(ARRAY[${schedule_ids}])
+               `
+
+                    const data3 = await client.query(query);
+
+
+                    let diferit = 0;
+
+                    arr.tickets.forEach(function (value, index) {
+                        if(index > 0 && schedule_ids[index]!=schedule_ids[index-1]){
+                            diferit = index
+
+                        }
+                        if(schedule_ids[index] === schedule_ids[diferit]){
+                            Response.content.tickets[value] = data3.rows[diferit]
+
+                        }else{
+                            Response.content.tickets[value] = data3.rows[index]
+
+                        }
+                    });
+                }else{
+                    Response.content.tickets = 'none'
+                }
+
                 Response.code=0;
             }
 
