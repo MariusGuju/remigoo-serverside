@@ -302,8 +302,6 @@ function scheduleMovie( movie_title, hall, time, date, id, prices, movie_id){
         try {
             let Tickets = Array(84).fill(0);
             const tickets_query = `{${Tickets}}`
-            console.log(tickets_query)
-            console.log( `INSERT INTO schedule(movie_title, hall, time, date, movie_id, id,tickets, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}',${movie_id}, ${id},'${tickets_query}', '${prices}')'`);
 
             const data = await client.query(`INSERT INTO schedule(movie_title, hall, time, date, movie_id, id,tickets, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}',${movie_id}, ${id},'${tickets_query}' , '${prices}')`);
 
