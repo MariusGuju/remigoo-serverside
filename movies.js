@@ -329,7 +329,7 @@ function getMovies(title){
             const query = `
             SELECT DISTINCT Movies.id, Movies.title, Movies.year, Movies.genre, Movies.duration, Movies.trailer_link, Movies.suggestions,Schedule.date,Movies.img
                 FROM Movies
-                LEFT JOIN Schedule ON Schedule.id = Movies.id
+                LEFT JOIN Schedule ON Schedule.movie_id = Movies.id
                 where UPPER(Movies.title) LIKE '%' || UPPER('${title}') || '%'
                 LIMIT 7;
             `
@@ -337,8 +337,6 @@ function getMovies(title){
             const arr = data.rows;
 
             let catalog = {}
-
-
 
             arr.forEach((movie)=>{
                 if(catalog[movie.id]){
@@ -349,8 +347,6 @@ function getMovies(title){
                     catalog[movie.id].dates = [movie.date]
                 }
             })
-
-
 
             var result = []
 

@@ -107,7 +107,6 @@ app.get('/get-movies', async (req, res) => {
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de get movies")
     const jsonResponse = await movieFunctions.getMovies(req.query.title);
-    console.log("gata")
     res.send(jsonResponse)
 })
 
