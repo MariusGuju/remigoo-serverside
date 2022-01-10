@@ -199,7 +199,7 @@ function getMoviesByID(ID){
 
             //query pentru a gasi toate schedule de la film respectiv
             const query2 = `
-            SELECT Schedule.id, Schedule.tickets, Schedule.date, Schedule.time, Schedule.hall
+            SELECT Schedule.id, Schedule.tickets, Schedule.date, Schedule.time, Schedule.hall, Schedule.prices
                 FROM Schedule
                 where Schedule.movie_id='${ID}'
             `
@@ -291,7 +291,7 @@ function addMovie(title, year, genre, duration, trailer_link, data){
 }
 
 
-function scheduleMovie( movie_title, hall, time, date, id, prices, movie_id){
+function scheduleMovie( movie_title, hall, time, date, prices, movie_id){
     return (async () => {
         const client = await pool.connect()
         let Response = {
@@ -303,7 +303,7 @@ function scheduleMovie( movie_title, hall, time, date, id, prices, movie_id){
             let Tickets = Array(84).fill(0);
             const tickets_query = `{${Tickets}}`
 
-            const data = await client.query(`INSERT INTO schedule(movie_title, hall, time, date, movie_id, id,tickets, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}',${movie_id}, ${id},'${tickets_query}' , '${prices}')`);
+            const data = await client.query(`INSERT INTO schedule(movie_title, hall, time, date, movie_id,tickets, prices) VALUES('${movie_title}', '${hall}', '${time}', '${date}',${movie_id},'${tickets_query}' , '${prices}')`);
 
             if(data != undefined && data.rowCount != 0){
                 Response.content = "success"

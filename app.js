@@ -158,7 +158,7 @@ app.get('/schedule-movie', async (req, res) => {
     let date = new Date();
     let timestamp = ` -- ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()} --`
     console.log(timestamp, "Case de schedule movie")
-    const jsonResponse = await movieFunctions.scheduleMovie( req.query.movie_title, req.query.hall, req.query.time, req.query.date,req.query.id, req.query.prices, req.query.movie_id);
+    const jsonResponse = await movieFunctions.scheduleMovie( req.query.movie_title, req.query.hall, req.query.time, req.query.date, req.query.prices, req.query.movie_id);
     res.send(jsonResponse)
 })
 
